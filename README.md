@@ -1,2 +1,3 @@
 ## Laboratory assignments and more to come...
-Third year of Computer Science bachelor degree; course of functional programming.
+Third year of Computer Science bachelor degree.
+Course of functional programming.
