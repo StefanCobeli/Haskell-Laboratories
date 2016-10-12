@@ -1,3 +1,2 @@
-# Haskell-Laboratories
 ## Laboratory assignments and more to come...
 Third year of Computer Science, bachelor degree, course.
