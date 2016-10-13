@@ -105,13 +105,11 @@ e4c5Nf3 = undefined
 --- "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R"
 
 
-
---tableFromFen :: String -> Picture
-
-
+--Used for decomposing the FEN string.
 getLinesArrayFromString :: String -> [String]
 getLinesArrayFromString pattern = splitOn "/" pattern
 
+--Function that transforms a character ito corespondent piece.
 getPictureFromChar :: Char -> Picture
 getPictureFromChar x = case x of
                      'r' -> rook
@@ -130,24 +128,30 @@ getPictureFromChar x = case x of
                      
                      _ -> repeatH (digitToInt x) clear
 
+--Transforms a string coresponding to a line into an array of pictures.
 getLineFromString :: String -> [Picture]
 getLineFromString sequence = map getPictureFromChar sequence
 
+--Concatenate an array of pictures.
 plotLine :: [Picture] -> Picture
 plotLine [x] = x
 plotLine (x:rest) = beside x (plotLine rest)
 
+--Get the picture of an entire row from a string (e.g. "R3r").
 pictureFromSequence :: String -> Picture
 pictureFromSequence sequence = plotLine (getLineFromString sequence)
                  
+--Append the pictures of an array one on top of the other.
 getTableFromLines :: [Picture] -> Picture
 getTableFromLines [line] = line
 getTableFromLines (line:rest) = above line (getTableFromLines rest)
 
+--Give a picture of the table from a FEN sequence, but without grid.
 tableFromFen :: String -> Picture
 tableFromFen input = getTableFromLines 
          (map pictureFromSequence (getLinesArrayFromString input))
          
+--Give a picture of the table from a FEN sequence with a chess grid in the back.
 plotTableFromFen :: String -> Picture
 plotTableFromFen input = over (tableFromFen input) emptyBoard
                  
