@@ -51,11 +51,14 @@ prop_inRange lo hi xs = (inRangeRec lo hi xs) == (inRange lo hi xs)
 
 -- List-comprehension version
 countPositives :: [Int] -> Int
-countPositives = undefined
+countPositives xs = length [x | x <- xs,
+								x > 0]
 
 -- Recursive version
 countPositivesRec :: [Int] -> Int
-countPositivesRec = undefined
+countPositivesRec [] = 0
+countPositivesRec (x:xs) | x > 0 = 1 + countPositivesRec xs
+						 | otherwise = countPositivesRec xs
 
 -- Mutual test
 prop_countPositives :: [Int] -> Bool
@@ -67,15 +70,17 @@ prop_countPositives = undefined
 
 -- Helper function
 discount :: Int -> Int
-discount = undefined
+discount price = round ((fromIntegral price :: Float) * 0.9) 
 
 -- List-comprehension version
 pennypincher :: [Int] -> Int
-pennypincher = undefined
+pennypincher xs = sum [discount(x) | x <- xs, (discount x) <= 19900]
 
 -- Recursive version
 pennypincherRec :: [Int] -> Int
-pennypincherRec = undefined
+pennypincherRec [] = 0
+pennypincherRec (x:xs) | discount x <= 19900 = discount x + pennypincherRec xs
+					| otherwise = pennypincherRec xs
 
 -- Mutual test
 prop_pennypincher :: [Int] -> Bool
@@ -87,11 +92,13 @@ prop_pennypincher = undefined
 
 -- List-comprehension version
 multDigits :: String -> Int
-multDigits = undefined
+multDigits xs = product [digitToInt x | x <- xs, isDigit x]
 
 -- Recursive version
 multDigitsRec :: String -> Int
-multDigitsRec = undefined
+multDigitsRec [] = 1
+multDigitsRec (x:xs) | isDigit x = digitToInt x * multDigitsRec xs
+					 | otherwise = multDigitsRec xs
 
 -- Mutual test
 prop_multDigits :: String -> Bool
@@ -103,7 +110,7 @@ prop_multDigits = undefined
 
 -- List-comprehension version
 capitalise :: String -> String
-capitalise = undefined
+capitalise (x:xs) = ( toUpper x : [toLower y | y <- xs] )
 
 -- Recursive version
 capitaliseRec :: String -> String
@@ -118,8 +125,13 @@ prop_capitalise = undefined
 -- 7. title
 
 -- List-comprehension version
+
+wiseCapitalise :: String -> String
+wiseCapitalise word | length word > 3 = capitalise word
+					| otherwise = [toLower x | x <- word]
+					
 title :: [String] -> [String]
-title = undefined
+title (x:xs) = (capitalise x : map wiseCapitalise xs) 
 
 -- Recursive version
 titleRec :: [String] -> [String]
