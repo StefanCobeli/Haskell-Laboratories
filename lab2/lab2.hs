@@ -51,18 +51,17 @@ prop_inRange lo hi xs = (inRangeRec lo hi xs) == (inRange lo hi xs)
 
 -- List-comprehension version
 countPositives :: [Int] -> Int
-countPositives xs = length [x | x <- xs,
-								x > 0]
+countPositives xs = length [x | x <- xs, x > 0]
 
 -- Recursive version
 countPositivesRec :: [Int] -> Int
 countPositivesRec [] = 0
 countPositivesRec (x:xs) | x > 0 = 1 + countPositivesRec xs
-						 | otherwise = countPositivesRec xs
+                          | otherwise = countPositivesRec xs
 
 -- Mutual test
 prop_countPositives :: [Int] -> Bool
-prop_countPositives = undefined
+prop_countPositives xs = (countPositives xs) == (countPositivesRec xs)
 
 
 
@@ -80,11 +79,11 @@ pennypincher xs = sum [discount(x) | x <- xs, (discount x) <= 19900]
 pennypincherRec :: [Int] -> Int
 pennypincherRec [] = 0
 pennypincherRec (x:xs) | discount x <= 19900 = discount x + pennypincherRec xs
-					| otherwise = pennypincherRec xs
+                       | otherwise = pennypincherRec xs
 
 -- Mutual test
 prop_pennypincher :: [Int] -> Bool
-prop_pennypincher = undefined
+prop_pennypincher xs = (pennypincher xs) == (pennypincherRec xs) 
 
 
 
@@ -98,11 +97,11 @@ multDigits xs = product [digitToInt x | x <- xs, isDigit x]
 multDigitsRec :: String -> Int
 multDigitsRec [] = 1
 multDigitsRec (x:xs) | isDigit x = digitToInt x * multDigitsRec xs
-					 | otherwise = multDigitsRec xs
+                     | otherwise = multDigitsRec xs
 
 -- Mutual test
 prop_multDigits :: String -> Bool
-prop_multDigits = undefined
+prop_multDigits xs = (multDigits xs) == (multDigitsRec xs)
 
 
 
@@ -110,15 +109,21 @@ prop_multDigits = undefined
 
 -- List-comprehension version
 capitalise :: String -> String
+capitalise "" = ""
 capitalise (x:xs) = ( toUpper x : [toLower y | y <- xs] )
 
 -- Recursive version
+capitaliseRecHelper :: String -> String
+capitaliseRecHelper [x] = [toUpper x]
+capitaliseRecHelper (x:xs) = (toLower x : capitaliseRec xs)
+
+
 capitaliseRec :: String -> String
-capitaliseRec = undefined
+capitaliseRec xs = reverse (capitaliseRec (reverse xs))
 
 -- Mutual test
 prop_capitalise :: String -> Bool
-prop_capitalise = undefined
+prop_capitalise xs = (capitaliseRec xs) == (capitalise xs)
 
 
 
@@ -128,16 +133,28 @@ prop_capitalise = undefined
 
 wiseCapitalise :: String -> String
 wiseCapitalise word | length word > 3 = capitalise word
-					| otherwise = [toLower x | x <- word]
-					
+                    | otherwise = [toLower x | x <- word]
+                     
 title :: [String] -> [String]
-title (x:xs) = (capitalise x : map wiseCapitalise xs) 
+title [] = []
+title (x:xs) = (capitalise x : [ wiseCapitalise y | y <- xs])
 
 -- Recursive version
+titleRecHelper :: [String] -> [String]
+titleRecHelper [] = []
+--titleRecHelper [x] = [capitalise x]
+titleRecHelper (x:xs) = ( wiseCapitalise x : titleRecHelper xs)
+
+--titleRec :: [String] -> [String]
+--titleRec xs = reverse (titleRecHelper (reverse xs))
+
+
+
 titleRec :: [String] -> [String]
-titleRec = undefined
+titleRec [] = []
+titleRec (x:xs) = capitalise x : titleRecHelper xs
 
 -- mutual test
 prop_title :: [String] -> Bool
-prop_title = undefined
+prop_title xs = (title xs == titleRec xs) 
 
