@@ -64,13 +64,17 @@ prop_search word letter = ( searchRec word letter == search word letter)
 
 -- List-comprehension version
 contains :: String -> String -> Bool
-contains = undefined
+contains word group = 0 < length [index | index <- [0..(length word - length group)], 
+									  isPrefixOf group (drop index word)
+							]
 
 -- Recursive version
 containsRec :: String -> String -> Bool
+containsRec _ "" = True
+containsRec "" _ = False
 containsRec (first:word) group | length group > length word  + 1 = False
-							| group `isPrefixOf` (first:word) = True
-							| otherwise = contains word group
+							   | isPrefixOf group (first:word) = True
+							   | otherwise = contains word group
 
 -- Mutual test
 prop_contains :: String -> String -> Bool

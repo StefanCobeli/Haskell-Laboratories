@@ -60,9 +60,9 @@ prop_cipher key word = decipherStr key (encipherStr key word) == normalize(word)
 
 -- 11.
 contains :: String -> String -> Bool
-contains (first:word) group | length group > length word  + 1 = False
-							| group `isPrefixOf` (first:word) = True
-							| otherwise = contains word group
+contains word group = 0 < length [index | index <- [0..(length word - length group)], 
+									  isPrefixOf group (drop index word)
+							]
 
 -- 12.
 candidates :: String -> [(Int, String)]
