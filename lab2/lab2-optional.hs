@@ -68,9 +68,11 @@ contains = undefined
 
 -- Recursive version
 containsRec :: String -> String -> Bool
-containsRec = undefined
+containsRec (first:word) group | length group > length word  + 1 = False
+							| group `isPrefixOf` (first:word) = True
+							| otherwise = contains word group
 
 -- Mutual test
 prop_contains :: String -> String -> Bool
-prop_contains = undefined
+prop_contains word group = contains word group == containsRec word group
 
