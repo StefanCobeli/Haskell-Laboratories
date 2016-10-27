@@ -70,3 +70,51 @@ candidates cipherText = [(key, decipherStr key cipherText) | key <- [0..26],
                               contains (decipherStr key cipherText) "THE" 
                               || contains (decipherStr key cipherText) "AND"
                         ]
+
+
+-- Optional Material
+
+-- 13.
+splitEachFive :: String -> [String]
+splitEachFive phrase | phrase == [] = []
+                     | length phrase < 5 = [phrase ++ (replicate (5 - length phrase) 'X')]
+                     | otherwise = [take 5 phrase] ++ (splitEachFive (drop 5 phrase))
+-- 14.
+prop_transpose :: String -> Property
+prop_transpose phrase = ([length row| row <- matrix] == replicate (length matrix) (length (head matrix))) ==> transpose (transpose matrix) == matrix
+ where matrix = splitEachFive phrase
+ 
+-- 15.
+encrypt :: Int -> String -> String
+encrypt key message = concat (transpose (splitEachFive (encipherStr key message)))
+
+-- 16.
+removeFinalXs :: String -> String
+removeFinalXs [] = []
+removeFinalXs sequence | last sequence == 'X' = removeFinalXs (init sequence)
+                       | otherwise = sequence
+                       
+splitIn :: String -> Int -> [String]
+splitIn phrase number | phrase == [] = []
+                        | length phrase < number = [phrase ++ (replicate (number - length phrase) 'X')]
+                        | otherwise = [take number phrase] ++ (splitIn (drop number phrase) number )
+ 
+
+decrypt :: Int -> String -> String
+decrypt key cipherText = decipherStr key ( removeFinalXs (concat (transpose (splitIn cipherText ((length cipherText) `div` 5)))))
+
+-- Challenge (Optional)
+
+-- 17.
+countFreqs :: String -> [(Char, Int)]
+countFreqs phrase = [(letter, occurences) | letter <- ['A'..'z'], 
+                     let occurences = (length [x | x <- phrase, x == letter]),
+                     occurences > 0
+                    ]                     
+
+-- 18
+getKey :: Char -> Int
+getKey letter = (26 + (ord letter) - 69) `mod` 26
+
+--freqDecipher :: String -> [String]
+--freqDecipher cipherText = countFreqs (map toUpper cipherText)
