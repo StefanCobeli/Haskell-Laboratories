@@ -5,7 +5,7 @@
 
 import Data.Char
 import Test.QuickCheck
-
+import Data.List
 
 
 -- 1. Map
@@ -104,40 +104,44 @@ productRec (x:xs) = x * productRec xs
 
 -- (7 simboluri)
 productFold :: [Int] -> Int
-productFold = undefined
+productFold sequence = foldr (*) 1 sequence 
 
 prop_product :: [Int] -> Bool
 prop_product xs = productRec xs == productFold xs
 
 -- b.  (16 simboluri)
 andRec :: [Bool] -> Bool
-andRec = undefined
+andRec [] = True
+andRec (x : xs) = x && andRec xs 
 
 -- (7 simboluri)
 andFold :: [Bool] -> Bool
-andFold = undefined
+andFold list = foldr (&&) True list
 
 prop_and :: [Bool] -> Bool
 prop_and xs = andRec xs == andFold xs 
 
 -- c.  (17 simboluri)
 concatRec :: [[a]] -> [a]
-concatRec = undefined
+concatRec [] = [] 
+concatRec (x : xs) = x ++ concatRec xs
 
 -- (8 simboluri)
 concatFold :: [[a]] -> [a]
-concatFold = undefined
+concatFold list = foldr (++) [] list
 
 prop_concat :: [String] -> Bool
 prop_concat strs = concatRec strs == concatFold strs
 
 -- d.  (17 simboluri)
 rmCharsRec :: String -> String -> String
-rmCharsRec = undefined
+rmCharsRec _ [] = []
+rmCharsRec [] word = word 
+rmCharsRec (first : badLetters) word = rmCharsRec badLetters (rmChar first badLetters)
 
 -- (6 simboluri)
 rmCharsFold :: String -> String -> String
-rmCharsFold = undefined
+rmCharsFold badLetters word = foldr rmChar word badLetters
 
 prop_rmChars :: String -> String -> Bool
 prop_rmChars chars str = rmCharsRec chars str == rmCharsFold chars str
@@ -150,19 +154,29 @@ type Matrix = [[Int]]
 -- 5
 -- a. (10 simboluri)
 uniform :: [Int] -> Bool
-uniform = undefined
+uniform [] = True
+uniform sequence = all (==0) [x - sequence !! 0 | x <- sequence]
 
 -- b. (	 simboluri)
 valid :: Matrix -> Bool
-valid = undefined
+valid matrix = uniform (map length matrix)
 
 -- 6.
 
 -- 7.  (22 simboluri + 19 simboluri)  cu tot cu tratarea erorilor
+plusRow :: [Int] -> [Int] -> [Int]
+plusRow row1 row2 | length row1 == length row2 = zipWith (+) row1 row2
+				  |	otherwise = error "The matrix does not have the same type!"
+
 plusM :: Matrix -> Matrix -> Matrix
-plusM = undefined
+plusM matrix1 matrix2 = zipWith plusRow matrix1 matrix2  
 
 -- 8. (23 simboluri + 15 simboluri)  cu tot cu tratarea erorilor  
+dot :: [Int] -> [Int] -> Int
+dot vector1 vector2 | length vector1 == length vector2 =  foldr (+) 0 (zipWith (*) vector1 vector2)
+                    | otherwise = error "The matrix does not have the same type!"
+                    
 timesM :: Matrix -> Matrix -> Matrix
-timesM = undefined
+timesM matrix1 matrix2 = foldr (++) [] [[map (dot row) (transpose matrix2)]| row <- matrix1] 
+
 
