@@ -19,16 +19,12 @@ doubles numbers = map (*2) numbers
 
 -- c. (10 simboluri)
 penceToPounds :: [Int] -> [Float]
-penceToPounds = map ( (/100) . fromIntegral)  
-
-
-penceToPounds2 :: [Int] -> [Float]
-penceToPounds2 xs = map f xs
-    where f x = fromIntegral x / 100
+penceToPounds = undefined
 
 -- d. (11 simboluri)
 uppers' :: String -> String
-uppers' word = [toUpper letter | letter <- word]
+uppers' word | word == "" = ""
+             | otherwise = [toUpper letter | letter <- word]
 
 -- (8 simboluri)
 prop_uppers :: String -> Bool
@@ -39,15 +35,15 @@ prop_uppers word = uppers word == uppers' word
 -- 2. Filter
 -- a. (4 simboluri)
 alphas :: String -> String
-alphas = filter isLetter 
+alphas sequence = filter isLetter sequence 
 
 -- b. (8 simboluri)
 rmChar ::  Char -> String -> String
-rmChar letter = filter (/= letter)
+rmChar letter sequence = filter (/= letter) sequence
 
 -- c. (8 simboluri)
 above :: Int -> [Int] -> [Int]
-above number = filter (> number)
+above number sequence = filter (> number) sequence
 
 -- d. (13 simboluri)
 unequals :: [(Int,Int)] -> [(Int,Int)]
@@ -183,4 +179,5 @@ dot vector1 vector2 | length vector1 == length vector2 =  foldr (+) 0 (zipWith (
 timesM :: Matrix -> Matrix -> Matrix
 timesM matrix1 matrix2 = foldr (++) [] [[map (dot row) (transpose matrix2)]| row <- matrix1] 
 
-
+-- Optional material
+-- 9.
