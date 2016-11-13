@@ -48,6 +48,8 @@ c :: String -> String -> String
 c first second = [x | ((x,y),z) <- zip (zip first [0..]) second, 
 					first !! y == second !! y]
 
+--Much more simple:
+--c first second = [x | (x,y) <- zip first second, first == second]
 					
 --b
 d :: String -> String -> String
