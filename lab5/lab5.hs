@@ -9,7 +9,8 @@ import Data.List( nub )
 import Test.QuickCheck( quickCheck, 
                         Arbitrary( arbitrary ),
                         oneof, elements, sized  )
-
+import Data.Function
+import Data.Bool
 -- Warmup exercises
 
 -- The datatype 'Fruit'
@@ -61,6 +62,8 @@ data Prop = Var Name
           | Not Prop
           | Prop :|: Prop
           | Prop :&: Prop
+		  | Prop :->: Prop
+		  | Prop :<->: Prop
           deriving (Eq, Ord)
 
 type Names = [Name]
@@ -77,6 +80,9 @@ showProp (T)            =  "T"
 showProp (Not p)        =  "(~" ++ showProp p ++ ")"
 showProp (p :|: q)      =  "(" ++ showProp p ++ "|" ++ showProp q ++ ")"
 showProp (p :&: q)      =  "(" ++ showProp p ++ "&" ++ showProp q ++ ")"
+showProp (p :->: q)     =  "(" ++ showProp p ++ "->" ++ showProp q ++ ")"
+showProp (p :<->: q)    =  "(" ++ showProp p ++ "<->" ++ showProp q ++ ")"
+
 
 -- evaluates a proposition in a given environment
 eval :: Env -> Prop -> Bool
@@ -86,6 +92,8 @@ eval e (T)            =  True
 eval e (Not p)        =  not (eval e p)
 eval e (p :|: q)      =  eval e p || eval e q
 eval e (p :&: q)      =  eval e p && eval e q
+eval e (p :->: q)     =  not (eval e p) || eval e q
+eval e (p :<->: q)    =  eval e p == eval e q 
 
 -- retrieves the names of variables from a proposition - 
 --  NOTE: variable names in the result must be unique
@@ -96,6 +104,8 @@ names (T)            =  []
 names (Not p)        =  names p
 names (p :|: q)      =  nub (names p ++ names q)
 names (p :&: q)      =  nub (names p ++ names q)
+names (p :->: q)     =  nub (names p ++ names q)
+names (p :<->: q)    =  nub (names p ++ names q)
 
 -- creates all possible truth assignments for a set of variables
 envs :: Names -> [Env]
@@ -111,42 +121,70 @@ satisfiable p  =  or [ eval e p | e <- envs (names p) ]
 -- Exercises ------------------------------------------------------------
 
 -- 4.
-p1 = undefined
-p2 = undefined 
-p3 = undefined
+p1 = ((Var "P" :|: Var "Q") :&: (Var "P" :&: Var "Q"))
+p2 = (Var "P" :|: Var "Q") :&: ((Not (Var "P")) :&: (Not (Var "Q"))) 
+p3 = (Var "P" :&: (Var "Q" :|: Var "R")) :&:
+	(((Not (Var "P")) :|: (Not (Var "Q"))) :&: 
+	(Not (Var "P")) :|: (Not (Var "R")) )
 
+--((P & (Q ∨ R)) & (((¬P ) ∨ (¬Q)) & ((¬P ) ∨ (¬R))))
+--((Var "P" :&: Not (Var "Q")) :&: (Var "Q" :|: Var "P"))
 
 -- 5. 
 tautology :: Prop -> Bool
-tautology = undefined
+tautology proposition = and (
+		map ((flip eval) proposition)  (envs (names proposition))
+		) 
 
 prop_taut1 :: Prop -> Bool
-prop_taut1 = undefined
+prop_taut1 proposition = (tautology proposition) 
+			||  (satisfiable (Not proposition))
 
 prop_taut2 :: Prop -> Bool
-prop_taut2 = undefined
+prop_taut2 proposition = (tautology (Not proposition)) 
+			||  (satisfiable  proposition)
 
 
 -- 6.
-p4 = undefined
-p5 = undefined
-p6 = undefined 
-
+p4 = (Var "P" :->: Var "Q") :&: (Var "P" :<->: Var "Q")
+p5 = (Var "P" :->: Var "Q") :&: (Var "P" :<->: (Not (Var "Q")))
+p6 = (Var "P" :<->: Var "Q") :&:
+	 (Var "P" :&: (Not (Var "Q"))) :|:
+	 ((Not (Var "P")) :&: (Var "Q"))
 
 -- 7.
 equivalent :: Prop -> Prop -> Bool
-equivalent = undefined
+equivalent prop1 prop2 = 
+	map ((flip eval) prop1)  (envs (names (prop1 :&: prop2)))
+	==
+	map ((flip eval) prop2)  (envs (names (prop1 :&: prop2)))
 
 equivalent' :: Prop -> Prop -> Bool
-equivalent' = undefined
+equivalent' prop1 prop2 = tautology (prop1 :<->: prop2)
 
 prop_equivalent :: Prop -> Prop -> Bool
-prop_equivalent = undefined
+prop_equivalent prop1 prop2 = equivalent prop1 prop2 
+							==
+							equivalent prop2 prop1
 
 
 -- 8.
+--nub function removes duplicates from a list
+removeDuplicates :: Eq a => [a] -> [a]
+removeDuplicates = foldl (\seen x -> if x `elem` seen
+                                      then seen
+                                      else seen ++ [x]) []
 subformulas :: Prop -> [Prop]
-subformulas = undefined
+subformulas (T)         = [T]
+subformulas (F)         = [F]
+subformulas (Var x)     = [Var x]
+subformulas (Not p)     = nub ([Not p] ++ subformulas p)
+subformulas (p :|: q)   = nub ([p :|: q] ++ subformulas p ++ subformulas q)
+subformulas (p :&: q)   = nub ([p :&: q] ++ subformulas p ++ subformulas q)
+subformulas (p :->: q)  = nub ([p :->: q] ++ subformulas p ++ subformulas q)
+subformulas (p :<->: q) = nub ([p :<->: q] ++ subformulas p ++ subformulas q)
+
+
 
 
 -- For QuickCheck --------------------------------------------------------
@@ -162,8 +200,8 @@ instance Arbitrary Prop where
                                        , liftM Not subform
                                        , liftM2 (:|:) subform subform
                                        , liftM2 (:&:) subform subform
-                                     --  , liftM2 (:->:) subform subform
-                                     --  , liftM2 (:<->:) subform' subform'
+                                       , liftM2 (:->:) subform subform
+                                       , liftM2 (:<->:) subform' subform'
                                        ]
                  where
                    atom = oneof [liftM Var (elements ["P", "Q", "R", "S"]),
