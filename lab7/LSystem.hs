@@ -6,7 +6,7 @@
 module LSystem (
     display,
     Command (..),
-    Pen (..), black, white, red, green, blue,
+    Pen (..), black, white, red, green, blue, salmon, forest, midnight,
     Distance, Angle,
     triangle, tree
    )
@@ -79,13 +79,15 @@ penToRGB :: Pen -> GL.Color3 GL.GLfloat
 penToRGB (Colour r g b)  =  GL.Color3 r g b
 penToRGB Inkless  =  error "penToRGB: inkless"
 
-white, black, red, green, blue :: Pen
-white = Colour 1.0 1.0 1.0
-black = Colour 0.0 0.0 0.0
-red   = Colour 1.0 0.0 0.0
-green = Colour 0.0 1.0 0.0
-blue  = Colour 0.0 0.0 1.0
-
+white, black, red, green, blue, salmon, forest, midnight :: Pen
+white      = Colour 1.0 1.0 1.0
+black      = Colour 0.0 0.0 0.0
+red        = Colour 1.0 0.0 0.0
+green      = Colour 0.0 1.0 0.0
+blue       = Colour 0.0 0.0 1.0
+salmon     = Colour 0.910 0.625 0.476
+forest     = Colour 0.132 0.542 0.132
+midnight   = Colour 0.115 0.115 0.512
 -- Lines
 
 data Ln = Ln Pen Pnt Pnt
@@ -226,7 +228,7 @@ tree x  =  f x
                  :#: Branch (p :#: f (x-1))
                  :#: Branch (g (x-1) :#: f (x-1))
   g 0      = GrabPen blue :#: Go 10
-  g x  = g (x-1) :#: g (x-1)
+  g x      = g (x-1) :#: g (x-1)
   n        = Turn 45
   p        = Turn (-45)
 
