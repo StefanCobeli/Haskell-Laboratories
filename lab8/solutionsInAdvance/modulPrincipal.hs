@@ -34,7 +34,7 @@ import ArboreBinarDeCautare
 main :: IO ()
 main = do
     line <- getLine --aici ia inputul de sub formă de String 
-    putStrLn (formatNumbersToString (toList (fromList (getNumbersFromInput line))))
+    (putStrLn . formatNumbersToString . toList . fromList . getNumbersFromInput) line
 --linia dubioasă de mai sus ia inputul, 
 --1. îl spltuiește la întâlnirea spațiilor și îl transformă în array de Int, 
 --2. îl transformă în arbore binar, 

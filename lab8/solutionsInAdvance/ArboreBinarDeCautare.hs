@@ -30,7 +30,7 @@ module ArboreBinarDeCautare (
 
 data Arbore a = Nil 
               | Node a (Arbore a) (Arbore a)
-    deriving Show
+    deriving (Show,Read)
 
 adauga :: (Ord q) => q -> Arbore q -> Arbore q
 adauga leaf Nil             = Node leaf Nil Nil

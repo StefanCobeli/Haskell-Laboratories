@@ -3,4 +3,7 @@ module Principal where
 import Arbore
 
 main :: IO [Int]
-main = undefined
+main  =  do 
+            line <- getLine
+            let x = map read (words line) :: [Int]
+            return $ parcurgere $ ini x
