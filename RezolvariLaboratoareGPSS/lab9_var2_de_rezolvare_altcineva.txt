@@ -1,0 +1,101 @@
+La o fabrica de produse electronice cererile de produse vin la un interval de timp repartizat exponential cu media de 5 ore. Produsele sunt formate din trei componente: componenta1, componenta2 si componenta3. De fiecare data cand soseste o cerere la fabrica se fac doua copii ale cererii. Cererea initiala este folosita pentru prelucrarea componentei1 de catre masina1, prelucrare care dureaza 200 plus sau minus 100 de minute. Prima copie este folosita pentru a fabrica a doua componenta de catre masina2, procedeu care dureaza 80 plus sau minus 20 de minute, iar a doua copie este pentru a fabrica cea de-a treia componenta de catre masina3, procedeu care dureaza 150 plus sau minus 30 de minute. Din fabricarea componentei2 si a componentei3 se face parte si un test de potrivire a componentei2 si a componentei3 realizat de tot de masina2 si de masina3, test care dureaza 50 plus sau minus 10 minute. 
+
+Dupa fabricarea componentelor au loc urmatoarele activitati:
+1 Asamblarea celor trei componente pentru o prelucrare care dureaza 60 de minute. 
+2 Dezasamblarea celor trei componente pentru o ultima prelucrare a primei componente de catre masina11 (durata este 100 plus sau minus 20), a celei de-a doua componente de catre masina12 (durata este 120 plus sau minus 30) si a celei de-a treia componente de catre masina13 (durata este 120 plus sau minus 30) . 
+3 Asamblarea finala care dureaza 150 plus sau minus 30 de minute.
+
+Simulati fabricarea a 50 de produse. Determinati distributia timpului necesar ca un produs sa fie asamblat.
+Determinati timpii medii de asteptare la masina1, masina2, masina3, masina11, masina12, masina13.
+
+ 
+
+
+distrtimp table m1,100,100,20
+
+generate(exponential(1,0,300))
+
+split 2,comp_23_initial,1
+
+queue qmasina1
+seize masina1
+depart qmasina1
+
+advance 200,100
+release masina1
+
+adunare gather 3
+
+advance 60
+
+test e 1,p1,prelucrare23
+
+queue qmasina11
+seize masina11
+depart qmasina11
+
+advance 100,20
+release masina11
+
+dezasamblare assemble 3
+
+advance 150,30
+
+tabulate distrtimp
+terminate 1
+
+comp_23_initial test e 2,p1,comp_3_initial
+
+queue qmasina2
+seize masina2
+depart qmasina2
+
+advance 80,20
+release masina2
+
+ccc2 match ccc3 
+
+queue qmasina2
+seize masina2
+depart qmasina2
+
+advance 50,10
+release masina2
+
+transfer ,adunare
+
+prelucrare23 test e 2,p1,prelucrare3
+
+queue qmasina12
+seize masina12
+depart qmasina12
+
+advance 120,30
+release masina12
+transfer ,dezasamblare
+
+comp_3_initial queue qmasina3
+seize masina3
+depart qmasina3
+
+advance 150,30
+release masina3
+
+ccc3 match ccc2
+
+queue qmasina3
+seize masina3
+depart qmasina3
+
+advance 50,10
+release masina3
+
+transfer ,adunare
+
+prelucrare3 queue qmasina13
+seize masina13
+depart qmasina13
+
+advance 120,30
+release masina13
+transfer ,dezasamblare

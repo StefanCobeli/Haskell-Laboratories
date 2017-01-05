@@ -1,0 +1,47 @@
+;Lab3GPSS StefanCobeli
+
+
+
+Depozit STORAGE 2000
+HistogramaDepozit TABLE S$Depozit,100,100,20
+
+Unitati VARIABLE 1000-S$Depozit
+Cerere VARIABLE RN1@24+40
+Initial EQU 1000
+Prag  EQU 800
+
+;Pentru fiecare tip de tranzactie avem cate un generate
+;Pentru Depuneri
+GENERATE 5
+
+TEST G S$Depozit,800,Depunere
+TERMINATE 
+
+Depunere ENTER Depozit,V$Unitati
+ADVANCE 5
+
+TERMINATE
+
+
+
+;Pentru Cereri
+GENERATE 1
+
+TABULATE Hist
+
+ASSIGN Cer,V$Cerere
+TEST GE S$Depozit,P$Cer,Term
+LEAVE Depozit,P$Cer
+
+
+Term TERMINATE 1
+
+
+
+
+GENERATE ,,,1
+ENTER Depozit,1000
+TERMINATE
+
+
+Hist TABLE S$Depozit,100,100,20

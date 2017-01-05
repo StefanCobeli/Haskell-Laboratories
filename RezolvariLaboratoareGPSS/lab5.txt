@@ -1,0 +1,56 @@
+﻿Intr-o linie de productie robotizata lucreaza 2 masini secvential si un robot care deplaseaza componentele de la punctul de sosire la prima masina, de la prima masina la a doua masina si de la a 2-a masina la iesirea din acel spatiu de productie. 
+Timpul intre sosirile componentelor la acea linie de productie este distribuit exponential cu o medie de 150 secunde.
+Componentele sunt prelucrate secvential mai intai de prima masina si apoi de cea de-a doua masina. Robotul are nevoie 8+-1s pt a prinde sau pt a elibera componente. 
+De asemenea robotul are neboie de 6s pt a duce componentele de la zona sosirilor la prima masina(M1), 7s pt a aduce componente de la prima masina la a 2-a masina (m2) si 5s pt a duce componentele  de la m2 in zona componentelor prelucrate.
+Timpul de prelucrare al m1 e distribuit normal cu o medie de 60s si o deviatie standard de 10 s si timpul de prelucrare al celei de-a doua masini e distribuit exponential al celei de-a doua masini e distribuit exponential cu o medie de 100s.
+Sa se simuleze functionarea liniei de productie pt 75 de componente prelucrate.
+Sa se determine distributia timpului necesat pt ca o componenta sa fie prelucrata(histograma), utilizarea robotului si a celor 2 masini si timpul mediu pe care il asteapta componentele inainte de a intra in urmatoarele etape de prelucrare. Prindetea de catre robot pentru a fi dusa la prima masina, intratea la m1, prinderea de catre robot pt a fi dusa la m2, intratea la m2 si prinderea de catre robot pt a fi dusa in zona de componente prelucrate
+
+
+
+
+
+TIMPNECESAR TABLE M1,100,100,20
+
+ROBOT STORAGE 2
+
+GENERATE (EXPONENTIAL(1,0,150))
+
+QUEUE IMAS1
+ENTER ROBOT
+DEPART IMAS1
+ADVANCE 8,1
+ADVANCE 6
+ADVANCE 8,1
+LEAVE ROBOT
+
+QUEUE MAS1
+SEIZE MASINA1
+DEPART MAS1
+ADVANCE (NORMAL(1,60,10))
+RELEASE MASINA1
+
+QUEUE MAS1MAS2
+ENTER ROBOT
+DEPART MAS1MAS2
+ADVANCE 8,1
+ADVANCE 7
+ADVANCE 8,1
+LEAVE ROBOT
+
+QUEUE MAS2
+SEIZE MASINA2
+DEPART MAS2
+ADVANCE (EXPONENTIAL(1,0,100))
+RELEASE MASINA2
+
+QUEUE MAS2F
+ENTER ROBOT
+DEPART MAS2F
+ADVANCE 8,1
+ADVANCE 5
+ADVANCE 8,1
+LEAVE ROBOT
+
+TABULATE TIMPNECESAR
+TERMINATE 1
