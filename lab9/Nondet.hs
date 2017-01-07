@@ -41,7 +41,7 @@ solveQuadratic a b c = lift (/(2*a)) # lift (b+) # sqrts $ delta
 -- (b) lift g # lift f = lift (g.f)
 check_unit1, check_unit2 :: (Complex Float -> Nondet (Complex Float)) -> Complex Float -> Bool
 check_unit1 f x = (f # unit) x == (unit # f) x
-check_unit2 f x = undefined
+check_unit2 f x = f x == (f # unit) x 
 
 test_unit1, test_unit2 :: IO ()
 test_unit1 = quickCheck $ check_unit1 sqrts 
