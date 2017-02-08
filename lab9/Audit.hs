@@ -49,3 +49,34 @@ test_lift = quickCheck $ check_lift (+2) (*3)
 
 -- Exercise Ten (a): Rewrite the module to make Audit instance of 
 -- the Monad typeclass
+
+--Exercise Ten personal interpretation.
+data MyAudit a = MyA (a, String)
+    deriving (Eq, Show)
+
+instance Functor MyAudit where 
+    fmap packY (MyA (x, xMsg)) = MyA (y, xMsg ++ "")
+                                    where y = packY x
+
+instance Applicative MyAudit where
+    pure x                      = MyA (x, "") 
+    MyA (packY, yMsg) <*> MyA (x, xMsg) = MyA (y, xMsg ++ yMsg)
+                                    where y = packY x
+
+instance Monad MyAudit where
+    return x                = pure x --MyA (x, "")
+    MyA (x, xMsg) >>= packY = MyA (y, xMsg ++ yMsg)
+                                where MyA (y, yMsg) = packY x
+    
+
+-- Implementing the above tests with monad operations.
+myLift :: (a -> b) -> (a -> MyAudit b)
+myLift f = pure . f   
+                        
+check_my_lift :: (Float -> Float) -> (Float -> Float) -> Float -> Bool
+check_my_lift f g x = myLift (f . g) x == ((myLift g) x >>= myLift f)
+
+test_my_lift :: IO ()
+test_my_lift = quickCheck $ check_my_lift (+2) (*3)                        
+                        
+      
