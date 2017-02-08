@@ -13,6 +13,7 @@ sqrts x = [y, negate y]
 -- Exercise Four:  Apply the function on all input values and aggregate the results
 bind :: (a -> Nondet b) -> (Nondet a -> Nondet b)
 bind f roots = foldr (++) [] [f x| x <- roots]
+--alternative cleaner solution -- bind f x = concat (map f x)
 
 -- Using # instead of * for composition to avoid ambiguities
 (#) :: (b -> Nondet c) -> (a -> Nondet b) -> (a -> Nondet c)
@@ -57,6 +58,34 @@ test_lift = quickCheck $ check_lift (+2) (*3)
 -- Exercise Ten(b): Rewrite the module to make Nondet instance of 
 -- the Monad typeclass
 
+data MyRoots a = MyR [a]
+    deriving (Eq, Show)
+
+instance Functor MyRoots where
+    fmap compR (MyR roots) = MyR (map compR roots)
+
+instance Applicative MyRoots where
+    pure root               = MyR [root]
+    MyR compR <*> MyR roots = MyR (concat [map comp roots | comp <- compR]) 
+    
+instance Monad MyRoots where
+    return              = pure
+    MyR roots >>= compR = foldr concRoots (MyR []) (map compR roots)
+        where 
+            concRoots (MyR x) (MyR y) = MyR (x++y)
+
+            
+mySqrts :: Floating a => a -> MyRoots a
+mySqrts x = MyR [y, negate y]
+  where
+    y = sqrt x
+            
+mySolveQuadratic :: Floating a  => a -> a -> a -> MyRoots a
+mySolveQuadratic a b c = myAdd (MyR [0] >>= return . (/(2*a))  
+                            >>= (return . (b+))) (mySqrts $ delta)
+                              where
+                                myAdd (MyR x) (MyR y) = MyR [head x + head y, head x + last y]
+                                delta = b*b - 4*a*c
 
 -- Exercise Eleven(b):  Write the solution to the quadratic equation in do notation
 
